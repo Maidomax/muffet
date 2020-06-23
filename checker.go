@@ -1,11 +1,11 @@
-package main
+package muffet
 
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"sync"
 
-	"github.com/fatih/color"
 	"github.com/valyala/fasthttp"
 )
 
@@ -126,9 +126,9 @@ func stringChannelToSlice(sc <-chan string) []string {
 }
 
 func formatLinkSuccess(u string, s int) string {
-	return color.GreenString("%v", s) + "\t" + u
+	return fmt.Sprintf("%v", s) + "\t" + u
 }
 
 func formatLinkError(u string, err error) string {
-	return color.RedString(err.Error()) + "\t" + u
+	return err.Error() + "\t" + u
 }

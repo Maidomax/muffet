@@ -1,10 +1,8 @@
-package main
+package muffet
 
 import (
 	"sort"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
 type pageResult struct {
@@ -28,7 +26,7 @@ func (r pageResult) String(v bool) string {
 	}
 
 	return strings.Join(
-		append(append([]string{color.YellowString(r.url)},
+		append(append([]string{r.url},
 			ss...),
 			formatMessages(r.errorMessages)...),
 		"\n")

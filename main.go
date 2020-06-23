@@ -1,4 +1,4 @@
-package main
+package muffet
 
 import (
 	"fmt"
@@ -6,27 +6,38 @@ import (
 	"os"
 )
 
-func main() {
-	s, err := command(os.Args[1:], os.Stdout)
+// func main() {
+// 	s, err := command(os.Args[1:], os.Stdout)
+
+// 	if err != nil {
+// 		fprintln(os.Stderr, err)
+// 		os.Exit(1)
+// 	}
+
+// 	os.Exit(s)
+// }
+
+func Crawl(url string) (map[string][]string, error) {
+	s, err := command([]string{url}, os.Stdout)
 
 	if err != nil {
 		fprintln(os.Stderr, err)
-		os.Exit(1)
 	}
 
-	os.Exit(s)
+	return s, nil
 }
 
-func command(ss []string, w io.Writer) (int, error) {
+func command(ss []string, w io.Writer) (map[string][]string, error) {
 	args, err := getArguments(ss)
+	resultMap := make(map[string][]string)
 
 	if err != nil {
-		return 0, err
+		return resultMap, err
 	}
 
 	c, err := newChecker(args.URL, checkerOptions{
 		fetcherOptions{
-			args.Concurrency,
+			2, //args.Concurrency,
 			args.ExcludedPatterns,
 			args.Headers,
 			args.IgnoreFragments,
@@ -35,7 +46,7 @@ func command(ss []string, w io.Writer) (int, error) {
 			args.Timeout,
 			args.OnePageOnly,
 		},
-		args.BufferSize,
+		9999, //args.BufferSize,
 		args.FollowRobotsTxt,
 		args.FollowSitemapXML,
 		args.FollowURLParams,
@@ -43,24 +54,21 @@ func command(ss []string, w io.Writer) (int, error) {
 	})
 
 	if err != nil {
-		return 0, err
+		return resultMap, err
 	}
 
 	go c.Check()
 
-	s := 0
-
 	for r := range c.Results() {
 		if !r.OK() || args.Verbose {
-			fprintln(w, r.String(args.Verbose))
-		}
-
-		if !r.OK() {
-			s = 1
+			// fprintln(w, r.String(args.Verbose))
+			resultMap[r.url] = r.errorMessages
 		}
 	}
 
-	return s, nil
+	// rs, _ := json.Marshal(resultMap)
+
+	return resultMap, nil
 }
 
 func fprintln(w io.Writer, xs ...interface{}) {
