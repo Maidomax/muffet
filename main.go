@@ -66,8 +66,6 @@ func command(ss []string, w io.Writer) (map[string][]string, error) {
 		}
 	}
 
-	// rs, _ := json.Marshal(resultMap)
-
 	return resultMap, nil
 }
 
